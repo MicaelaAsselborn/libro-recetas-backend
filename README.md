@@ -41,8 +41,7 @@ Este es un proyecto personal creado con fines didacticos.
 
 ### 8. DESARROLLO Y CALIDAD
 
-- nodemon: Reiniciador automático del servidor
-- ts-node: Ejecutor de TypeScript sin compilar
+- ts-node-dev: Ejecuta TypeScript directamente y reinicia automáticamente al detectar cambios (combina ts-node + nodemon)
 - @types/\*: Definiciones de tipos para librerías JavaScript
 
 ### 9. LOGGING

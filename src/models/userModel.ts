@@ -33,7 +33,7 @@ export interface UpdateUserData {
 
 export const userModel = {
 
-    // CREAR USUSARIO
+    // CREAR USUARIO
     async createUser(userData: CreateUserData): Promise<User> {
         // Validar rol por defecto
         const role = userData.role || "user";
@@ -122,7 +122,7 @@ export const userModel = {
         const existingUser = await this.findById(id);
         if(!existingUser) {
             // Si no existe, lanza un error
-            throw new Error(`updateUser: Usuario con ID: ${id} no encontrado`);
+            throw new Error(`deleteUser: Usuario con ID: ${id} no encontrado`);
         }
         const [result] = await pool.query(
             `DELETE FROM users WHERE id = ?`,

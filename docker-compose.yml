@@ -1,0 +1,38 @@
+services:
+    mysql:
+        image: mysql:8.0
+        container_name: recetario-mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: recetario123
+            MYSQL_DATABASE: libro_de_recetas
+            MYSQL_USER: recetario_user
+            MYSQL_PASSWORD: recetario123
+        ports:
+            - "3307:3306"
+        volumes:
+            - recetario_mysql_data:/var/lib/mysql
+        networks:
+            - recetario-network
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: recetario-phpmyadmin
+        restart: always
+        environment:
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+            PMA_ARBITRARY: 1
+        ports:
+            - "8081:80"
+        depends_on:
+            - mysql
+        networks:
+            - recetario-network
+
+networks:
+    recetario-network:
+        driver: bridge
+
+volumes:
+    recetario_mysql_data:

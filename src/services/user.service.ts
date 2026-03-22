@@ -122,3 +122,65 @@ export const updateUser = async (
 
 	return await userModel.findUserById(id);
 };
+
+// Borrado lógico
+export const softDeleteUser = async (
+	id: number,
+): Promise<UserWithoutPassword | null> => {
+	// Verificar que el usuario existe
+	const existingUser = await userModel.findUserById(id);
+	if (!existingUser) {
+		throw new Error(`No se encontró el usuario con ID: ${id}`);
+	}
+
+	// Verificar que no esté ya desactivado
+	if (!existingUser.isActive) {
+		throw new Error("El usuario ya está desactivado");
+	}
+
+	const updated = await userModel.softDeleteUser(id);
+	if (!updated) {
+		throw new Error("No se pudo desactivar el usuario");
+	}
+
+	return await userModel.findUserById(id);
+};
+
+// Reactivar usuario
+export const reactivateUser = async (
+	id: number,
+): Promise<UserWithoutPassword | null> => {
+	const existingUser = await userModel.findUserById(id);
+	if (!existingUser) {
+		throw new Error(`No se encontró el usuario con ID: ${id}`);
+	}
+
+	if (existingUser.isActive) {
+		throw new Error("El usuario ya está activo");
+	}
+
+	const updated = await userModel.reactivateUser(id);
+	if (!updated) {
+		throw new Error("No se pudo reactivar el usuario");
+	}
+
+	return await userModel.findUserById(id);
+};
+
+// Borrado físico (solo admin)
+export const hardDeleteUser = async (id: number): Promise<boolean> => {
+	const existingUser = await userModel.findUserById(id);
+	if (!existingUser) {
+		throw new Error(`No se encontró el usuario con ID: ${id}`);
+	}
+
+	// // Verificar que no tenga recetas
+	// const recipes = await recipeModel.findByUserId(id);
+	// if (recipes.length > 0) {
+	// 	throw new Error(
+	// 		"No se puede eliminar un usuario con recetas asociadas",
+	// 	);
+	// }
+
+	return await userModel.hardDeleteUser(id);
+};

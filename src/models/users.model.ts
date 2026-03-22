@@ -116,3 +116,33 @@ export const updateUser = async (
 
 	return (result as any).affectedRows > 0;
 };
+
+// Borrado lógico (solo desactivar)
+export const softDeleteUser = async (id: number): Promise<boolean> => {
+	const [result] = await pool.query(
+		"UPDATE users SET isActive = false, updated_on = NOW() WHERE id = ?",
+		[id],
+	);
+	return (result as any).affectedRows > 0;
+};
+
+// Reactivar usuario
+export const reactivateUser = async (id: number): Promise<boolean> => {
+	const [result] = await pool.query(
+		"UPDATE users SET isActive = true, updated_on = NOW() WHERE id = ?",
+		[id],
+	);
+	return (result as any).affectedRows > 0;
+};
+
+// Borrado físico (eliminar definitivamente)
+export const hardDeleteUser = async (id: number): Promise<boolean> => {
+	// Primero verificar si tiene recetas
+	const [recipes] = await pool.query(
+		"SELECT COUNT(*) as count FROM recipes WHERE user_id = ?",
+		[id],
+	);
+
+	const [result] = await pool.query("DELETE FROM users WHERE id = ?", [id]);
+	return (result as any).affectedRows > 0;
+};

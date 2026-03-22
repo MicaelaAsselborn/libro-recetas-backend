@@ -1,5 +1,6 @@
 import { UserRole } from "../types/auth";
 import * as userModel from "../models/users.model";
+import { IUser } from "../types/IUser";
 import { UserWithoutPassword } from "../models/users.model";
 import bcrypt from "bcrypt";
 
@@ -12,18 +13,17 @@ export const createUser = async (userData: {
 	role?: UserRole;
 	isActive?: boolean;
 }): Promise<UserWithoutPassword | null> => {
-	const existingEmail = await userModel.findByEmail(userData.email);
-	const existingUsername = await userModel.findByUsername(userData.username);
+	const existingUser = await userModel.findUserByUsernameOrEmail(
+		userData.username || userData.email,
+	);
 
-	if (existingEmail) {
-		throw new Error("El email ya está registrado");
-	} else if (existingUsername) {
-		throw new Error("El nombre de usuario ya está en uso");
+	if (existingUser) {
+		throw new Error("El nombre de usuario o email ya se esta registrado");
 	}
 
 	const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-	const userId = await userModel.create({
+	const userId = await userModel.createUser({
 		username: userData.username,
 		email: userData.email,
 		password: hashedPassword,
@@ -32,7 +32,36 @@ export const createUser = async (userData: {
 		isActive: userData.isActive !== undefined ? userData.isActive : true,
 	});
 
-	const newUser = await userModel.findById(userId);
+	const newUser = await userModel.findUserById(userId);
 
 	return newUser;
+};
+
+// Buscar todos los usuarios
+export const findAllUsers = async (): Promise<
+	Pick<IUser, "id" | "username" | "email">[]
+> => {
+	return await userModel.findAllUsers();
+};
+
+// Buscar por ID
+export const findUserById = async (
+	id: number,
+): Promise<UserWithoutPassword | null> => {
+	if (isNaN(id) || id <= 0) {
+		throw new Error("ID de usuario inválido");
+	}
+
+	return await userModel.findUserById(id);
+};
+
+// Buscar por usuario o email
+export const findUserByEmail = async (
+	identifier: string,
+): Promise<Pick<IUser, "id" | "username" | "email"> | null> => {
+	if (!identifier || identifier.trim() === "") {
+		throw new Error("Debe proporcionar un identificador");
+	}
+
+	return await userModel.findUserByUsernameOrEmail(identifier);
 };

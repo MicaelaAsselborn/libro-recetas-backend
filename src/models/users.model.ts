@@ -8,7 +8,7 @@ export interface UserRow extends IUser, RowDataPacket {}
 export declare type UserWithoutPassword = Omit<IUser, "password">;
 
 // Crear usuario (solo inserta, no hashea)
-export const create = async (userData: {
+export const createUser = async (userData: {
 	username: string;
 	email: string;
 	password: string;
@@ -30,8 +30,18 @@ export const create = async (userData: {
 	return (result as any).insertId;
 };
 
+// Buscar todos los usuarios
+export const findAllUsers = async (): Promise<
+	Pick<IUser, "id" | "username" | "email">[]
+> => {
+	const [rows] = await pool.query<UserRow[]>(
+		"SELECT id, username, email FROM users",
+	);
+	return rows;
+};
+
 // Buscar por ID
-export const findById = async (
+export const findUserById = async (
 	id: number,
 ): Promise<UserWithoutPassword | null> => {
 	const [rows] = await pool.query<UserRow[]>(
@@ -41,35 +51,17 @@ export const findById = async (
 	return rows[0] || null;
 };
 
-// Buscar por email
-export const findByEmail = async (
-	email: string,
-): Promise<Pick<IUser, "id" | "email"> | null> => {
-	const [rows] = await pool.query<UserRow[]>(
-		"SELECT id, email FROM users WHERE email = ?",
-		[email],
-	);
-	return rows[0] || null;
-};
-
-// Buscar por email con constraseña
-export const findByEmailWithPassword = async (
-	email: string,
-): Promise<IUser | null> => {
-	const [rows] = await pool.query<UserRow[]>(
-		"SELECT * FROM users WHERE email = ?",
-		[email],
-	);
-	return rows[0] || null;
-};
-
-// Buscar por username
-export const findByUsername = async (
-	username: string,
+//Buscar por usuario o por email
+export const findUserByUsernameOrEmail = async (
+	identifier: string,
 ): Promise<Pick<IUser, "id" | "username" | "email"> | null> => {
+	if (!identifier || identifier.trim() === "") {
+		throw new Error("Debe proporcionar un usuario o email");
+	}
+
 	const [rows] = await pool.query<UserRow[]>(
-		"SELECT id, username, email FROM users WHERE username = ?",
-		[username],
+		"SELECT id, username, email FROM users WHERE username = ? OR email = ?",
+		[identifier, identifier],
 	);
 	return rows[0] || null;
 };

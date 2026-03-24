@@ -22,7 +22,7 @@ export const findUserById = async (
 	id: number,
 ): Promise<UserWithoutPassword | null> => {
 	const [rows] = await pool.query<UserRow[]>(
-		"SELECT id, username, email, full_name, role, isActive, created_on, updated_on FROM users WHERE id = ?",
+		"SELECT id, username, email, full_name, role, is_active, created_on, updated_on FROM users WHERE id = ?",
 		[id],
 	);
 	return rows[0] || null;
@@ -57,17 +57,17 @@ export const createUser = async (userData: {
 	password: string;
 	full_name?: string;
 	role: UserRole;
-	isActive: boolean;
+	is_active: boolean;
 }): Promise<number> => {
 	const [result] = await pool.query(
-		"INSERT INTO users (username, email, password, full_name, role, isActive) VALUES (?, ?, ?, ?, ?, ?)",
+		"INSERT INTO users (username, email, password, full_name, role, is_active) VALUES (?, ?, ?, ?, ?, ?)",
 		[
 			userData.username,
 			userData.email,
 			userData.password,
 			userData.full_name || null,
 			userData.role,
-			userData.isActive,
+			userData.is_active,
 		],
 	);
 	return (result as any).insertId;
@@ -82,7 +82,7 @@ export const updateUser = async (
 		password?: string;
 		full_name?: string;
 		role?: UserRole;
-		isActive?: boolean;
+		is_active?: boolean;
 	},
 ): Promise<boolean> => {
 	// Construir la query dinámicamente
@@ -109,9 +109,9 @@ export const updateUser = async (
 		fields.push("role = ?");
 		values.push(updateData.role);
 	}
-	if (updateData.isActive !== undefined) {
-		fields.push("isActive = ?");
-		values.push(updateData.isActive);
+	if (updateData.is_active !== undefined) {
+		fields.push("is_active = ?");
+		values.push(updateData.is_active);
 	}
 
 	// Si no hay campos para actualizar, no hacer nada
@@ -131,7 +131,7 @@ export const updateUser = async (
 // Borrado lógico (solo desactivar)
 export const softDeleteUser = async (id: number): Promise<boolean> => {
 	const [result] = await pool.query(
-		"UPDATE users SET isActive = false, updated_on = NOW() WHERE id = ?",
+		"UPDATE users SET is_active = false, updated_on = NOW() WHERE id = ?",
 		[id],
 	);
 	return (result as any).affectedRows > 0;
@@ -140,7 +140,7 @@ export const softDeleteUser = async (id: number): Promise<boolean> => {
 // Reactivar usuario
 export const reactivateUser = async (id: number): Promise<boolean> => {
 	const [result] = await pool.query(
-		"UPDATE users SET isActive = true, updated_on = NOW() WHERE id = ?",
+		"UPDATE users SET is_active = true, updated_on = NOW() WHERE id = ?",
 		[id],
 	);
 	return (result as any).affectedRows > 0;

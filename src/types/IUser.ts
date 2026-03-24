@@ -7,7 +7,7 @@ export interface IUser {
 	password: string;
 	full_name?: string;
 	role: UserRole;
-	isActive: boolean;
+	is_active: boolean;
 	created_on: Date;
 	updated_on: Date;
 }

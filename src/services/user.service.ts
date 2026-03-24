@@ -1,9 +1,9 @@
 import { AppError } from "../middlewares/errorHandler";
 import { IUser } from "../types/IUser";
 import { UserRole } from "../types/auth";
-import { UserWithoutPassword } from "../models/users.model";
+import { UserWithoutPassword } from "../models/user.model";
 
-import * as userModel from "../models/users.model";
+import * as userModel from "../models/user.model";
 
 import bcrypt from "bcrypt";
 
@@ -43,7 +43,7 @@ export const createUser = async (userData: {
 	password: string;
 	full_name?: string;
 	role?: UserRole;
-	isActive?: boolean;
+	is_active?: boolean;
 }): Promise<UserWithoutPassword | null> => {
 	const existingUser = await userModel.findUserByUsernameOrEmail(
 		userData.username || userData.email,
@@ -64,7 +64,7 @@ export const createUser = async (userData: {
 		password: hashedPassword,
 		full_name: userData.full_name,
 		role: userData.role || UserRole.USER,
-		isActive: userData.isActive !== undefined ? userData.isActive : true,
+		is_active: userData.is_active !== undefined ? userData.is_active : true,
 	});
 
 	return await userModel.findUserById(userId);
@@ -141,7 +141,7 @@ export const softDeleteUser = async (
 	}
 
 	// Verificar que no esté ya desactivado
-	if (!existingUser.isActive) {
+	if (!existingUser.is_active) {
 		throw new AppError("El usuario ya está desactivado", 409);
 	}
 
@@ -162,7 +162,7 @@ export const reactivateUser = async (
 		throw new AppError(`No se encontró el usuario con ID: ${id}`, 404);
 	}
 
-	if (existingUser.isActive) {
+	if (existingUser.is_active) {
 		throw new AppError("El usuario ya está activo", 409);
 	}
 

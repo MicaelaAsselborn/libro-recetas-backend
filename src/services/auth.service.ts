@@ -1,10 +1,10 @@
 import { AppError } from "../middlewares/errorHandler";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { JwtPayload, UserRole } from "../types/auth";
-import { UserWithoutPassword } from "../models/users.model";
+import { UserWithoutPassword } from "../models/user.model";
 
 import * as userService from "../services/user.service";
-import * as userModel from "../models/users.model";
+import * as userModel from "../models/user.model";
 
 import bcrypt from "bcrypt";
 
@@ -55,7 +55,7 @@ export const login = async (
 	}
 
 	// Verificar que el usuario esté activo
-	if (!user.isActive) {
+	if (!user.is_active) {
 		throw new AppError(
 			"La cuenta está desactivada. Contacta al administrador.",
 			403,

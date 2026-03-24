@@ -1,6 +1,6 @@
 export interface JwtPayload {
 	//jsonwebtoken Payload personalizado
-	id: string;
+	id: number;
 	username: string;
 	role: UserRole;
 }

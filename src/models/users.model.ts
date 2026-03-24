@@ -5,7 +5,7 @@ import { IUser } from "../types/IUser";
 import { UserRole } from "../types/auth";
 
 export interface UserRow extends IUser, RowDataPacket {}
-export declare type UserWithoutPassword = Omit<IUser, "password">;
+export declare type UserWithoutPassword = Omit<IUser, "password"> | null;
 
 // Buscar todos los usuarios
 export const findAllUsers = async (): Promise<
@@ -35,6 +35,17 @@ export const findUserByUsernameOrEmail = async (
 	const [rows] = await pool.query<UserRow[]>(
 		"SELECT id, username, email FROM users WHERE username = ? OR email = ?",
 		[identifier, identifier],
+	);
+	return rows[0] || null;
+};
+
+// Buscar por email con contraseña (para login)
+export const findUserByEmailWithPassword = async (
+	email: string,
+): Promise<IUser | null> => {
+	const [rows] = await pool.query<UserRow[]>(
+		"SELECT * FROM users WHERE email = ?",
+		[email],
 	);
 	return rows[0] || null;
 };

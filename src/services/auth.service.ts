@@ -31,7 +31,7 @@ export const register = async (userData: {
 	});
 
 	if (!user) {
-		throw new AppError("Error al crear el usuario", 500);
+		throw new AppError("Error al registrar el usuario", 500);
 	}
 
 	return user;

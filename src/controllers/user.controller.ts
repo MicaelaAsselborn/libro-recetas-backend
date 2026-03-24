@@ -114,7 +114,9 @@ export const createUser = async (
 	res: Response,
 	next: NextFunction,
 ) => {
+	// Verifica errores de validación
 	const errors = validationResult(req);
+
 	if (!errors.isEmpty()) {
 		return res.status(400).json({
 			success: false,

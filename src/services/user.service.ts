@@ -1,7 +1,10 @@
-import { UserRole } from "../types/auth";
-import * as userModel from "../models/users.model";
+import { AppError } from "../middlewares/errorHandler";
 import { IUser } from "../types/IUser";
+import { UserRole } from "../types/auth";
 import { UserWithoutPassword } from "../models/users.model";
+
+import * as userModel from "../models/users.model";
+
 import bcrypt from "bcrypt";
 
 // Buscar todos los usuarios
@@ -16,18 +19,18 @@ export const findUserById = async (
 	id: number,
 ): Promise<UserWithoutPassword | null> => {
 	if (isNaN(id) || id <= 0) {
-		throw new Error("ID de usuario inválido");
+		throw new AppError("ID de usuario inválido", 400);
 	}
 
 	return await userModel.findUserById(id);
 };
 
 // Buscar por usuario o email
-export const findUserByEmail = async (
+export const findUserByUsernameOrEmail = async (
 	identifier: string,
 ): Promise<Pick<IUser, "id" | "username" | "email"> | null> => {
 	if (!identifier || identifier.trim() === "") {
-		throw new Error("Debe proporcionar un identificador");
+		throw new AppError("Debe proporcionar un identificador", 400);
 	}
 
 	return await userModel.findUserByUsernameOrEmail(identifier);
@@ -47,7 +50,10 @@ export const createUser = async (userData: {
 	);
 
 	if (existingUser) {
-		throw new Error("El nombre de usuario o email ya está registrado");
+		throw new AppError(
+			"El nombre de usuario o email ya está registrado",
+			409,
+		);
 	}
 
 	const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -77,7 +83,7 @@ export const updateUser = async (
 	// Validar que el usuario existe
 	const existingUser = await userModel.findUserById(id);
 	if (!existingUser) {
-		throw new Error(`No se encontró el usuario con ID: ${id}`);
+		throw new AppError(`No se encontró el usuario con ID: ${id}`, 404);
 	}
 
 	// Verificar que email no esté en uso por OTRO usuario
@@ -86,7 +92,7 @@ export const updateUser = async (
 			userData.email,
 		);
 		if (userWithEmail && userWithEmail.id !== id) {
-			throw new Error("El email ya está en uso por otro usuario");
+			throw new AppError("El email ya está en uso por otro usuario", 409);
 		}
 	}
 
@@ -96,8 +102,9 @@ export const updateUser = async (
 			userData.username,
 		);
 		if (userWithUsername && userWithUsername.id !== id) {
-			throw new Error(
+			throw new AppError(
 				"El nombre de usuario ya está en uso por otro usuario",
+				409,
 			);
 		}
 	}
@@ -117,30 +124,30 @@ export const updateUser = async (
 	});
 
 	if (!updated) {
-		throw new Error("No se pudo actualizar el usuario");
+		throw new AppError("No se pudo actualizar el usuario", 500);
 	}
 
 	return await userModel.findUserById(id);
 };
 
-// Borrado lógico
+// Borrado lógico (desactivar)
 export const softDeleteUser = async (
 	id: number,
 ): Promise<UserWithoutPassword | null> => {
 	// Verificar que el usuario existe
 	const existingUser = await userModel.findUserById(id);
 	if (!existingUser) {
-		throw new Error(`No se encontró el usuario con ID: ${id}`);
+		throw new AppError(`No se encontró el usuario con ID: ${id}`, 404);
 	}
 
 	// Verificar que no esté ya desactivado
 	if (!existingUser.isActive) {
-		throw new Error("El usuario ya está desactivado");
+		throw new AppError("El usuario ya está desactivado", 409);
 	}
 
 	const updated = await userModel.softDeleteUser(id);
 	if (!updated) {
-		throw new Error("No se pudo desactivar el usuario");
+		throw new AppError("No se pudo desactivar el usuario", 500);
 	}
 
 	return await userModel.findUserById(id);
@@ -152,16 +159,16 @@ export const reactivateUser = async (
 ): Promise<UserWithoutPassword | null> => {
 	const existingUser = await userModel.findUserById(id);
 	if (!existingUser) {
-		throw new Error(`No se encontró el usuario con ID: ${id}`);
+		throw new AppError(`No se encontró el usuario con ID: ${id}`, 404);
 	}
 
 	if (existingUser.isActive) {
-		throw new Error("El usuario ya está activo");
+		throw new AppError("El usuario ya está activo", 409);
 	}
 
 	const updated = await userModel.reactivateUser(id);
 	if (!updated) {
-		throw new Error("No se pudo reactivar el usuario");
+		throw new AppError("No se pudo reactivar el usuario", 500);
 	}
 
 	return await userModel.findUserById(id);
@@ -171,14 +178,14 @@ export const reactivateUser = async (
 export const hardDeleteUser = async (id: number): Promise<boolean> => {
 	const existingUser = await userModel.findUserById(id);
 	if (!existingUser) {
-		throw new Error(`No se encontró el usuario con ID: ${id}`);
+		throw new AppError(`No se encontró el usuario con ID: ${id}`, 404);
 	}
 
 	// // Verificar que no tenga recetas
 	// const recipes = await recipeModel.findByUserId(id);
 	// if (recipes.length > 0) {
-	// 	throw new Error(
-	// 		"No se puede eliminar un usuario con recetas asociadas",
+	// 	throw new AppError(
+	// 		"No se puede eliminar un usuario con recetas asociadas", 409
 	// 	);
 	// }
 

@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import pool, { testConnection } from "./config/database";
+import { errorHandler } from "./middlewares/errorHandler";
 import "dotenv/config";
 
 const app = express();
@@ -15,6 +15,8 @@ app.get("/ping", (req, res) => {
 		timestamp: new Date(),
 	});
 });
+
+app.use(errorHandler);
 
 // Iniciar el servidor HTTP
 app.listen(PORT, () => {

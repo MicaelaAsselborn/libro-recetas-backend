@@ -164,6 +164,20 @@ export const updateUser = async (
 		if (isNaN(id)) {
 			return next(new AppError("ID inválido", 400));
 		}
+
+		if (!req.user) {
+			return next(new AppError("Usuario no autenticado", 401));
+		}
+
+		if (Number(req.user.id) !== id && req.user.role !== "admin") {
+			return next(
+				new AppError(
+					"No tienes permiso para modificar este usuario",
+					403,
+				),
+			);
+		}
+
 		const updates = req.body;
 		if (Object.keys(updates).length === 0) {
 			return next(new AppError("No hay datos para actualizar", 400));
@@ -206,6 +220,19 @@ export const softDeleteUser = async (
 			return next(new AppError("ID debe ser un número válido", 400));
 		}
 
+		if (!req.user) {
+			return next(new AppError("Usuario no autenticado", 401));
+		}
+
+		if (Number(req.user.id) !== id && req.user.role !== "admin") {
+			return next(
+				new AppError(
+					"No tienes permiso para desactivar este usuario",
+					403,
+				),
+			);
+		}
+
 		const updatedUser = await userService.softDeleteUser(id);
 
 		return res.status(200).json({
@@ -225,14 +252,18 @@ export const reactivateUser = async (
 	next: NextFunction,
 ) => {
 	try {
-		const idParam = req.params.id;
-		if (Array.isArray(idParam)) {
-			return next(new AppError("ID inválido", 400));
-		}
-
-		const id = parseInt(idParam);
+		const id = parseInt(req.params.id as string);
 		if (isNaN(id)) {
 			return next(new AppError("ID debe ser un número válido", 400));
+		}
+
+		if (!req.user || req.user.role !== "admin") {
+			return next(
+				new AppError(
+					"Acceso denegado. Se requieren permisos de administrador",
+					403,
+				),
+			);
 		}
 
 		const updatedUser = await userService.reactivateUser(id);
@@ -264,14 +295,18 @@ export const hardDeleteUser = async (
 	next: NextFunction,
 ) => {
 	try {
-		const idParam = req.params.id;
-		if (Array.isArray(idParam)) {
-			return next(new AppError("ID inválido", 400));
-		}
-
-		const id = parseInt(idParam);
+		const id = parseInt(req.params.id as string);
 		if (isNaN(id)) {
 			return next(new AppError("ID debe ser un número válido", 400));
+		}
+
+		if (!req.user || req.user.role !== "admin") {
+			return next(
+				new AppError(
+					"Acceso denegado. Se requieren permisos de administrador",
+					403,
+				),
+			);
 		}
 
 		const deleted = await userService.hardDeleteUser(id);

@@ -27,7 +27,7 @@ export const register = async (userData: {
 		email: userData.email,
 		password: userData.password,
 		full_name: userData.full_name,
-		role: userData.role || UserRole.USER,
+		role: userData.role,
 	});
 
 	if (!user) {

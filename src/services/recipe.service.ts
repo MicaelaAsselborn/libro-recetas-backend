@@ -224,7 +224,7 @@ export const reactivateRecipe = async (
 	return await recipeModel.findRecipeById(id);
 };
 
-// Borrado físico (solo admin y autor de la receta)
+// Borrado físico (solo admin y autor)
 export const hardDeleteRecipe = async (
 	id: number,
 	authenticatedUserId: number,

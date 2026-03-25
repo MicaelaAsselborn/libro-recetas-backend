@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from "express";
 import { AppError } from "../middlewares/errorHandler";
+import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-import * as userService from "../services/user.service";
 import { UserRole } from "../types/auth";
+
+import * as userService from "../services/user.service";
 
 // Buscar todos los usuarios
 export const findAllUsers = async (
@@ -163,6 +164,7 @@ export const updateUser = async (
 ) => {
 	try {
 		const id = parseInt(req.params.id as string);
+
 		if (isNaN(id)) {
 			return next(new AppError("ID inválido", 400));
 		}

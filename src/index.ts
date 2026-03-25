@@ -1,8 +1,9 @@
 import express from "express";
 import { errorHandler } from "./middlewares/errorHandler";
 
-import userRouter from "./routes/user.routes";
 import authRouter from "./routes/auth.routes";
+import userRouter from "./routes/user.routes";
+import recipeRouter from "./routes/recipe.routes";
 
 import "dotenv/config";
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 
 app.use("/api/users", userRouter); // CRUD de usuarios
+app.use("/api/recipes", recipeRouter); // CRUD de recetas
 
 app.use(errorHandler);
 

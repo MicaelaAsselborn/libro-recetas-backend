@@ -34,3 +34,15 @@ export interface IRecipe {
 	created_on: Date;
 	updated_on: Date;
 }
+
+export interface FindRecipesFilters {
+	userId?: number; // Para "mis recetas" (filtra por usuario autenticado)
+	authorId?: number; // Para recetas de un autor específico
+	category?: string; // Filtro por category
+	tag?: string; // Filtro por tags (JSON)
+	title?: string; // Búsqueda por título
+	onlyPublic?: boolean; // Si es true, solo recetas públicas
+	isActive?: boolean; // Si es false, trae recetas inactivas (papelera)
+	limit?: number; // Paginación: cantidad de registros
+	offset?: number; // Paginación: desde dónde empezar
+}

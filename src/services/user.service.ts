@@ -1,9 +1,10 @@
 import { AppError } from "../middlewares/errorHandler";
-import { IUser } from "../types/IUser";
+import { IUser } from "../types/user";
 import { UserRole } from "../types/auth";
 import { UserWithoutPassword } from "../models/user.model";
 
 import * as userModel from "../models/user.model";
+import * as recipeModel from "../models/recipe.model";
 
 import bcrypt from "bcrypt";
 
@@ -181,13 +182,14 @@ export const hardDeleteUser = async (id: number): Promise<boolean> => {
 		throw new AppError(`No se encontró el usuario con ID: ${id}`, 404);
 	}
 
-	// // Verificar que no tenga recetas
-	// const recipes = await recipeModel.findByUserId(id);
-	// if (recipes.length > 0) {
-	// 	throw new AppError(
-	// 		"No se puede eliminar un usuario con recetas asociadas", 409
-	// 	);
-	// }
+	// Verificar que no tenga recetas
+	const recipes = await recipeModel.findRecipesByUserId(id);
+	if (recipes.length > 0) {
+		throw new AppError(
+			"No se puede eliminar un usuario con recetas asociadas. Primero elimina sus recetas.",
+			409,
+		);
+	}
 
 	return await userModel.hardDeleteUser(id);
 };

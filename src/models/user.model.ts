@@ -2,7 +2,7 @@
 import pool from "../config/database";
 
 import { RowDataPacket } from "mysql2";
-import { IUser } from "../types/IUser";
+import { IUser } from "../types/user";
 import { UserRole } from "../types/auth";
 
 export interface UserRow extends IUser, RowDataPacket {}

@@ -6,25 +6,14 @@ import {
 	Category,
 	Ingredient,
 	InstructionStep,
-} from "../types/IRecipe";
+	FindRecipesFilters,
+} from "../types/recipe";
 
 export interface RecipeRow extends IRecipe, RowDataPacket {}
 
-interface FindAllRecipesFilters {
-	userId?: number; // Para "mis recetas" (filtra por usuario autenticado)
-	authorId?: number; // Para recetas de un autor específico
-	category?: string; // Filtro por category
-	tag?: string; // Filtro por tags (JSON)
-	title?: string; // Búsqueda por título
-	onlyPublic?: boolean; // Si es true, solo recetas públicas
-	isActive?: boolean; // Si es false, trae recetas inactivas (papelera)
-	limit?: number; // Paginación: cantidad de registros
-	offset?: number; // Paginación: desde dónde empezar
-}
-
 // Buscar todas las recetas
 export const findAllRecipes = async (
-	filters: FindAllRecipesFilters = {},
+	filters: FindRecipesFilters = {},
 ): Promise<IRecipe[]> => {
 	let query = `
         SELECT id, title, user_id, description, image_url, ingredients, instructions, category, tags, is_public, is_active, created_on updated_on FROM recipes WHERE 1=1
@@ -100,6 +89,17 @@ export const findRecipeById = async (id: number): Promise<IRecipe | null> => {
 		[id],
 	);
 	return rows[0] || null;
+};
+
+// Buscar recetas por user_id (para borrado fisico en userService)
+export const findRecipesByUserId = async (
+	userId: number,
+): Promise<IRecipe[]> => {
+	const [rows] = await pool.query<RecipeRow[]>(
+		"SELECT * FROM recipes WHERE user_id = ?",
+		[userId],
+	);
+	return rows;
 };
 
 // Crear receta

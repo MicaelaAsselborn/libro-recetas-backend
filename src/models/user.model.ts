@@ -1,5 +1,6 @@
 // src/models/userModel.ts
 import pool from "../config/database";
+
 import { RowDataPacket } from "mysql2";
 import { IUser } from "../types/IUser";
 import { UserRole } from "../types/auth";
@@ -14,6 +15,7 @@ export const findAllUsers = async (): Promise<
 	const [rows] = await pool.query<UserRow[]>(
 		"SELECT id, username, email FROM users",
 	);
+
 	return rows;
 };
 
@@ -50,7 +52,7 @@ export const findUserByEmailWithPassword = async (
 	return rows[0] || null;
 };
 
-// Crear usuario (solo inserta, no hashea)
+// Crear usuario
 export const createUser = async (userData: {
 	username: string;
 	email: string;

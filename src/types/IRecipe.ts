@@ -1,4 +1,4 @@
-export enum MainCategory {
+export enum Category {
 	MAIN = "principal",
 	DESSERT = "postre",
 	SNACKS = "aperitivos",
@@ -27,8 +27,8 @@ export interface IRecipe {
 	image_url?: string;
 	ingredients: Ingredient[];
 	instructions: InstructionStep[];
-	main_category: MainCategory;
-	optional_categories: string[];
+	category: Category;
+	tags?: string[];
 	is_public: boolean;
 	is_active: boolean;
 	created_on: Date;

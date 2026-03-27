@@ -1,0 +1,2 @@
+- [ ] Modificar para que login sea posible con username o email en vez de solo email
+- [ ] Agregar la opción de recuperar contraseña

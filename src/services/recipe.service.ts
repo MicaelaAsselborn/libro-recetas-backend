@@ -48,7 +48,9 @@ export const findAllRecipes = async (
 		finalFilters.isActive = true;
 	}
 
-	return await recipeModel.findAllRecipes(finalFilters);
+	const allRecipes = await recipeModel.findAllRecipes(finalFilters);
+
+	return allRecipes;
 };
 
 // Buscar por ID
